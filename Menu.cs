@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Quic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace AirportManager
 {
@@ -51,7 +51,7 @@ namespace AirportManager
             items = new List<string>();
             items.Add("Add Flight Info:");
             items.Add("View Flight Schedule");
-            items.Add("Check-in View");
+            items.Add("Passenger Info");
             items.Add("Quit");
         }
         public override int Selection(int index)
@@ -64,19 +64,21 @@ namespace AirportManager
                     Menu fm = new FlightMenu();
                     Console.Clear();
                     Console.WriteLine(fm.Print());
-                    Console.Write("Enter a choice 3 to quit:");
+                    Console.Write("Enter a choice 5 to quit:");
                     choice = Console.ReadLine();
-                    while (choice != "3")
+                    while (choice != "5")
                     {
                         if (int.TryParse(choice, out result) == false)
                         {
                             Console.WriteLine("Invalid");
+                            Console.Clear();
                         }
                         else
                         {
                             fm.Selection(result);
                         }
-                        Console.Write("Enter a choice 3 to quit:");
+                        Console.WriteLine(fm.Print());
+                        Console.Write("Enter a choice 5 to quit:");
                         choice = Console.ReadLine();
                     }
                     Console.Clear();
@@ -101,6 +103,8 @@ namespace AirportManager
             items = new List<string>();
             items.Add("Add Flight");
             items.Add("Add Passengers To flight");
+            items.Add("Save Flights");
+            items.Add("Load Flights");
             items.Add("Quit");
         }
         static Flight addflight()
@@ -112,6 +116,16 @@ namespace AirportManager
             flight.AircraftType = Console.ReadLine();
             Console.Write("Enter Destination:");
             flight.Destination = Console.ReadLine();
+            Console.Write("Enter Flight#:");
+            flight.FlightNumber = Console.ReadLine();
+            Console.Write("Enter Terminal:");
+            flight.Terminal = Console.ReadLine();
+            Console.Write("Enter Gate:");
+            flight.Gate = Console.ReadLine();
+            Console.Write("Enter Departure Time:");
+            flight.Time = Console.ReadLine();
+            
+
             flight.Status = PlaneStatus.OnTime;
 
             return flight;
@@ -122,13 +136,42 @@ namespace AirportManager
             switch (index)
             {
                 case 1:
-
                     Program.flights.Add(addflight());
                     return 1;
                 case 2:
-                    //view checkin
+                     var queryFlights =
+                        from flight in Program.flights
+                        select flight;
+                    var listFlights = queryFlights.ToList();
+                    Console.Clear();
+                    Console.Write("DepartingTo");
+                    Console.Write("\tAirline");
+                    Console.Write("\tFlight#");
+                    Console.Write("\tGate");
+                    Console.Write("\tTime\n");
+                    foreach (var item in listFlights)
+                    {
+                        Console.Write("{0}",item.Destination);
+                        Console.Write("\t\t{0}",item.Airline);
+                        Console.Write("\t{0}", item.FlightNumber);
+                        Console.Write("\t{0}{1}", item.Terminal, item.Gate);
+                        Console.Write("\t{0:T}\n", item.Time);
+                    
+                    }
+                    Console.ReadKey();
+                    Console.Clear();
+ 
                     return 1;
                 case 3:
+                    System.Xml.Serialization.XmlSerializer writer =
+                    new XmlSerializer(typeof(Flight)) ;
+                    FileStream file = File.Create("C:\\Users\\aldawson\\Source\\Repos\\Airport-Manager\\AirportData.xml");
+                    foreach (var item in Program.flights)
+                    {
+                        writer.Serialize(file, item);
+
+                    }
+                    file.Close();
                     return 0;
                 default:
                     return 1;

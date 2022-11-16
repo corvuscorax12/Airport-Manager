@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 
 namespace AirportManager
 {
-    class Flight
+    public class Flight
     {
         public string Airline { get; set; }
         public string Destination { get; set; }
         public string AircraftType { get; set; }
         public PlaneStatus Status { get; set; }
-        public List<Passengers> Passengers;
+        public string Terminal { get; set; }
+        public string Gate { get; set; }
+        public string FlightNumber { get; set; }
+        public string Time { get; set; }
     }
 class Passengers
 {
@@ -24,7 +27,7 @@ class Passengers
         public string Destination { get; set; }
         public bool CheckedIn { get; set; }
 }
-    enum PlaneStatus
+    public enum PlaneStatus
     {
         OnTime,
         Delayed10m,

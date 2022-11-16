@@ -11,9 +11,9 @@
             string choice;
             int result;
             Console.WriteLine(menu.Print());
-            Console.Write("Enter a choice 3 to quit:");
+            Console.Write("Enter a choice 99 to quit:");
             choice = Console.ReadLine();
-            while (choice != "3")
+            while (choice != "99")
             {
                 Console.Clear();
                 Console.WriteLine(menu.Print());
