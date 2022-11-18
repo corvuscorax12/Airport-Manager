@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AirportManager
+﻿namespace AirportManager
 {
     public class Flight
     {
@@ -17,8 +11,8 @@ namespace AirportManager
         public string FlightNumber { get; set; }
         public string Time { get; set; }
     }
-class Passengers
-{
+    class Passengers
+    {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Address { get; set; }
@@ -26,7 +20,8 @@ class Passengers
         public string Seat { get; set; }
         public string Destination { get; set; }
         public bool CheckedIn { get; set; }
-}
+        public int CheckedBags { get; set; }
+    }
     public enum PlaneStatus
     {
         OnTime,

@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-
-namespace AirportManager
+﻿namespace AirportManager
 {
+    /// <summary>
+    /// Menu abstract class
+    /// </summary>
     abstract class Menu
     {
         public Menu() => MenuAdd();
         protected abstract void MenuAdd();
         protected List<string> items;
-
-
+        
+        /// <summary>
+        /// Interprets the users selection
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns> </returns>
         public abstract int Selection(int index);
         public string Print()
         {
@@ -30,6 +29,9 @@ namespace AirportManager
         }
 
     }
+    /// <summary>
+    /// not used
+    /// </summary>
     public struct Box
     {
         public const string HORIZONTAL = "─";
@@ -43,9 +45,46 @@ namespace AirportManager
     }
 
 
-
+    /// <summary>
+    /// Main Menu to access data
+    /// </summary>
     class MainMenu : Menu
     {
+
+        public MainMenu()
+        {
+
+            string choice;
+            int result;
+
+
+            Console.WriteLine(this.Print());
+            Console.Write("Enter a choice 99 to quit:");
+            choice = Console.ReadLine();
+
+
+            while (choice != "4")
+            {
+                Console.Clear();
+                Console.WriteLine(this.Print());
+
+                if (int.TryParse(choice, out result) == false)
+                {
+                    Console.WriteLine("Invalid");
+                }
+                else
+                {
+                    this.Selection(result);
+                }
+
+                Console.Clear();
+                Console.WriteLine(this.Print());
+                Console.Write("Enter a choice 99 to quit:");
+                choice = Console.ReadLine();
+
+
+            }
+        }
         protected override void MenuAdd()
         {
             items = new List<string>();
@@ -59,76 +98,47 @@ namespace AirportManager
             switch (index)
             {
                 case 1:
-                    string choice;
-                    int result;
-                    Menu fm = new FlightMenu();
-                    Console.Clear();
-                    Console.WriteLine(fm.Print());
-                    Console.Write("Enter a choice 5 to quit:");
-                    choice = Console.ReadLine();
-                    while (choice != "5")
-                    {
-                        if (int.TryParse(choice, out result) == false)
-                        {
-                            Console.WriteLine("Invalid");
-                            Console.Clear();
-                        }
-                        else
-                        {
-                            fm.Selection(result);
-                        }
-                        Console.WriteLine(fm.Print());
-                        Console.Write("Enter a choice 5 to quit:");
-                        choice = Console.ReadLine();
-                    }
-                    Console.Clear();
+                    MainMenuHelpers.FlightInfo();
                     return 0;
                 case 2:
-                    //view checkin
+                    MainMenuHelpers.FlightSchedule();
+                    Console.Clear();
                     return 1;
                 case 3:
                     return 0;
                 default:
                     return 1;
             }
-
         }
     }
+    class FlightSelector : Menu
+    {
+        protected override void MenuAdd()
+        {
 
-
+            items = new List<string>();
+            foreach (var item in FlightMenuHelpers.GetFlights())
+            {
+                items.Add(string.Format("{0}/{1}", item.Airline, item.FlightNumber));
+            }
+        }
+        public override int Selection(int index)
+        {
+            return 0;
+        }
+    }
     class FlightMenu : Menu
     {
         protected override void MenuAdd()
         {
             items = new List<string>();
             items.Add("Add Flight");
-            items.Add("Add Passengers To flight");
+            items.Add("Add Passengers to Flight");
             items.Add("Save Flights");
             items.Add("Load Flights");
+            items.Add("Edit Flight");
+            items.Add("Delete Flight");
             items.Add("Quit");
-        }
-        static Flight addflight()
-        {
-            Flight flight = new Flight();
-            Console.Write("Enter Airline:");
-            flight.Airline = Console.ReadLine();
-            Console.Write("Enter Aircraft Type:");
-            flight.AircraftType = Console.ReadLine();
-            Console.Write("Enter Destination:");
-            flight.Destination = Console.ReadLine();
-            Console.Write("Enter Flight#:");
-            flight.FlightNumber = Console.ReadLine();
-            Console.Write("Enter Terminal:");
-            flight.Terminal = Console.ReadLine();
-            Console.Write("Enter Gate:");
-            flight.Gate = Console.ReadLine();
-            Console.Write("Enter Departure Time:");
-            flight.Time = Console.ReadLine();
-            
-
-            flight.Status = PlaneStatus.OnTime;
-
-            return flight;
         }
 
         public override int Selection(int index)
@@ -136,47 +146,51 @@ namespace AirportManager
             switch (index)
             {
                 case 1:
-                    Program.flights.Add(addflight());
+                    Program.flights.Add(FlightMenuHelpers.AddFlight());
+                    Console.Clear();
+
                     return 1;
                 case 2:
-                     var queryFlights =
-                        from flight in Program.flights
-                        select flight;
-                    var listFlights = queryFlights.ToList();
-                    Console.Clear();
-                    Console.Write("DepartingTo");
-                    Console.Write("\tAirline");
-                    Console.Write("\tFlight#");
-                    Console.Write("\tGate");
-                    Console.Write("\tTime\n");
-                    foreach (var item in listFlights)
-                    {
-                        Console.Write("{0}",item.Destination);
-                        Console.Write("\t\t{0}",item.Airline);
-                        Console.Write("\t{0}", item.FlightNumber);
-                        Console.Write("\t{0}{1}", item.Terminal, item.Gate);
-                        Console.Write("\t{0:T}\n", item.Time);
-                    
-                    }
-                    Console.ReadKey();
-                    Console.Clear();
- 
                     return 1;
                 case 3:
-                    System.Xml.Serialization.XmlSerializer writer =
-                    new XmlSerializer(typeof(Flight)) ;
-                    FileStream file = File.Create("C:\\Users\\aldawson\\Source\\Repos\\Airport-Manager\\AirportData.xml");
-                    foreach (var item in Program.flights)
+                    FlightMenuHelpers.SaveFlight();
+                    Console.Clear();
+                    return 0;
+                case 4:
+                    FlightMenuHelpers.LoadFlight();
+                    return 0;
+                case 5:
+                    Menu fs = new FlightSelector();
+                    Console.Clear();
+                    Console.WriteLine(fs.Print());
+                    
+                    string selFlight;
+                    Console.Write("Select flight to edit on list:");
+                    selFlight = Console.ReadLine();
+
+                    while (selFlight != "-99")
                     {
-                        writer.Serialize(file, item);
+                        if (int.TryParse(selFlight, out int result) == false)
+                        {
+                            Console.WriteLine("Invalid Flight");
+                        }
+                        else
+                        {
+                            FlightMenuHelpers.EditFlights(result);
+
+                        }
+                        Console.Write("Select flight to edit on list:");
+                        selFlight = Console.ReadLine(); 
 
                     }
-                    file.Close();
+
+
+                    Console.Clear();                   
                     return 0;
                 default:
+                    Console.Clear();
                     return 1;
             }
-
         }
     }
 }

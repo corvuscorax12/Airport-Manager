@@ -8,31 +8,7 @@
         {
 
             Menu menu = new MainMenu();
-            string choice;
-            int result;
-            Console.WriteLine(menu.Print());
-            Console.Write("Enter a choice 99 to quit:");
-            choice = Console.ReadLine();
-            while (choice != "99")
-            {
-                Console.Clear();
-                Console.WriteLine(menu.Print());
-
-                if (int.TryParse(choice, out result) == false)
-                {
-                    Console.WriteLine("Invalid");
-                }
-                else
-                {
-                    menu.Selection(result);
-                }
-                Console.Clear();
-                Console.WriteLine(menu.Print());
-                Console.Write("Enter a choice 3 to quit:");
-                choice = Console.ReadLine();
-
-
-            }
+           
 
         }
 
